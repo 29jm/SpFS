@@ -42,26 +42,26 @@ Node* Directory::getNode(const std::string& nodename) const
 	return nullptr;
 }
 
-Directory* getDirectory(const std::string& dirname) const
+Directory* Directory::getDirectory(const std::string& dirname) const
 {
 	for (Node* n : nodes)
 	{
 		if (n->name == dirname && n->type == Type::Directory)
 		{
-			return std::dynamic_cast<Directory*>(n);
+			return dynamic_cast<Directory*>(n);
 		}
 	}
 
 	return nullptr;
 }
 
-File* getFile(const std::string& filename) const
+File* Directory::getFile(const std::string& filename) const
 {
 	for (Node* n : nodes)
 	{
 		if (n->name == filename && n->type == Type::File)
 		{
-			return std::dynamic_cast<File*>(n);
+			return dynamic_cast<File*>(n);
 		}
 	}
 
