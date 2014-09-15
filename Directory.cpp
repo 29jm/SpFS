@@ -18,10 +18,18 @@ Directory::~Directory()
 	}
 }
 
-void Directory::addNode(Node* n)
+Node* Directory::addNode(Node* n)
 {
+	if (getNode(n->name))
+	{
+		// TODO: throw exception
+		return nullptr;
+	}
+
 	n->parent = this;
 	nodes.push_back(n);
+
+	return n;
 }
 
 std::vector<Node*> Directory::getChilds() const
@@ -121,3 +129,4 @@ Directory* Directory::fromStream(std::istream& stream)
 }
 
 }
+

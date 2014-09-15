@@ -13,7 +13,6 @@ class FileSystem
 {
 public:
 	FileSystem();
-	FileSystem(const std::string& filename);
 
 	~FileSystem();
 
@@ -26,6 +25,8 @@ public:
 private:
 	std::fstream file;
 	Directory* root;
+	bool valid_state;
 };
 
 }
+

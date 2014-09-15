@@ -22,7 +22,7 @@ public:
 	Directory* getDirectory(const std::string& dirname) const;
 	File* getFile(const std::string& filename) const;
 
-	void addNode(Node* n);
+	Node* addNode(Node* n);
 
 	// Serialization
 	virtual std::string serialize() const;
@@ -35,3 +35,4 @@ private:
 };
 
 }
+

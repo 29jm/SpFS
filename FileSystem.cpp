@@ -4,39 +4,25 @@ namespace SpFS
 {
 
 FileSystem::FileSystem()
-	: root(nullptr)
+	: root(nullptr), valid_state(false)
 {
 
-}
-
-FileSystem::FileSystem(const std::string& filename)
-	: root(nullptr)
-{
-	create(filename);
 }
 
 FileSystem::~FileSystem()
 {
-	if (root)
+	if (valid_state)
 	{
+		flush();
 		delete root;
-	}
-
-	if (file)
-	{
-		file.close();
 	}
 }
 
 bool FileSystem::load(const std::string& filename)
 {
-	if (root)
+	if (valid_state)
 	{
-		return false;
-	}
-
-	if (file.is_open())
-	{
+		// Reloading would cause memory leak
 		return false;
 	}
 
@@ -54,6 +40,12 @@ bool FileSystem::load(const std::string& filename)
 	}
 
 	root = Directory::fromStream(file);
+	if (root == nullptr)
+	{
+		return false;
+	}
+
+	valid_state = true;
 
 	return true;
 }
@@ -93,3 +85,4 @@ Directory* FileSystem::getRoot() const
 }
 
 }
+
