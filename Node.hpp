@@ -5,6 +5,7 @@
 namespace SpFS
 {
 
+class fstream;
 class File;
 class Directory;
 
@@ -17,7 +18,7 @@ public:
 
 	virtual ~Node();
 
-	virtual std::string serialize() const = 0;
+	virtual void serialize(std::fstream& file) const = 0;
 
 	virtual std::string getPath() const;
 	virtual std::string getName() const;

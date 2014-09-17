@@ -26,20 +26,27 @@ bool FileSystem::load(const std::string& filename)
 		return false;
 	}
 
-	file.open(filename, std::ios::in | std::ios::out);
+	file.open(filename, std::ios::in | std::ios::in | std::ios::binary);
 	if (!file)
 	{
+		std::cout << "failed to open file\n";
 		return false;
 	}
 
 	std::string type;
-	file >> type;
-	if (type != "DIRECTORY")
+	for (int i = 0; i < 3; i++)
 	{
+		char c;
+		file.read(&c, sizeof(c));
+		type += c;
+	}
+	if (type != "DIR")
+	{
+		std::cout << "type of root isn't DIR\n";
 		return false;
 	}
 
-	root = Directory::fromStream(file);
+	root = Directory::fromFile(file);
 	if (root == nullptr)
 	{
 		return false;
@@ -57,7 +64,7 @@ bool FileSystem::create(const std::string& filename)
 		return false;
 	}
 
-	file.open(filename, std::ios::out);
+	file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
 	if (!file)
 	{
 		std::cout << "failed to open file" << std::endl;
@@ -76,7 +83,7 @@ void FileSystem::flush()
 		return;
 	}
 
-	file << root->serialize();
+	root->serialize(file);
 }
 
 Directory* FileSystem::getRoot() const

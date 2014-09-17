@@ -38,46 +38,53 @@ std::string File::getDataAsString() const
 	return std::string(data.begin(), data.end());
 }
 
-std::string File::serialize() const
+void File::serialize(std::fstream& file) const
 {
-	std::string text;
+	const char* id = "FIL";
+	file.write(id, 3);
 
-	text += " ";
-	text += "FILE";
-	text += " "+name+" ";
-	text += std::to_string(data.size());
-	text += " ";
+	uint32_t name_size = name.size();
+	file.write(reinterpret_cast<char*>(&name_size), sizeof(name_size));
+	
+	file.write(name.c_str(), name.size());
+
+	uint64_t data_size = data.size();
+	file.write(reinterpret_cast<char*>(&data_size), sizeof(data_size));
 	
 	for (const char c : data)
 	{
-		text += c;
+		file.write(&c, sizeof(c));
 	}
-
-	return text;
 }
 
-File* File::fromStream(std::istream& stream)
+File* File::fromFile(std::fstream& file)
 {
-	std::string filename;
-	stream >> filename;
+	uint32_t name_size = 0;
+	file.read(reinterpret_cast<char*>(&name_size), sizeof(name_size));
 
-	File* file = new File(filename);
+	std::string filename;
+	for (int i = 0; i < name_size; i++)
+	{
+		char c;
+		file.read(&c, sizeof(c));
+		filename += c;
+	}
+
+	File* newfile = new File(filename);
+	newfile->name = filename;
 
 	uint64_t size;
-	stream >> size;
+	file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
-	// May read leading space/line feed, skip last char
-	stream.ignore();
-	file->data.reserve(size);
+	newfile->data.reserve(size);
 	for (int i = 0; i < size; i++)
 	{
 		char c;
-		stream.get(c);
-
-		file->data.push_back(c);
+		file.read(&c, sizeof(c));
+		newfile->data.push_back(c);
 	}
 
-	return file;
+	return newfile;
 }
 
 }

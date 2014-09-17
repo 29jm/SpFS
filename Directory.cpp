@@ -16,6 +16,11 @@ Directory::~Directory()
 	{
 		delete n;
 	}
+
+	for (Node* n : removed)
+	{
+		delete n;
+	}
 }
 
 Node* Directory::addNode(Node* n)
@@ -26,10 +31,38 @@ Node* Directory::addNode(Node* n)
 		return nullptr;
 	}
 
-	n->parent = this;
-	nodes.push_back(n);
+	if (n)
+	{
+		n->parent = this;
+		nodes.push_back(n);
 
-	return n;
+		return n;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+void Directory::removeNode(const std::string& nodename)
+{
+	for (unsigned int i = 0; i < nodes.size(); i++)
+	{
+		if (nodes[i]->name == nodename)
+		{
+			removed.push_back(nodes[i]);
+			nodes.erase(nodes.begin()+i);
+		}
+	}
+}
+
+void Directory::renameNode(const std::string& n, const std::string& newname)
+{
+	Node* node = getNode(n);
+	if (node)
+	{
+		node->name = newname;
+	}
 }
 
 std::vector<Node*> Directory::getChilds() const
@@ -77,46 +110,74 @@ File* Directory::getFile(const std::string& filename) const
 }
 
 
-std::string Directory::serialize() const
+void Directory::serialize(std::fstream& file) const
 {
-	std::string text;
+	const char* id = "DIR";
+	file.write(id, 3);
 
-	text += " ";
-	text += "DIRECTORY";
-	text += " "+name+" ";
-	text += std::to_string(nodes.size());
+	uint32_t name_size = name.size();
+	file.write(reinterpret_cast<char*>(&name_size), sizeof(name_size));
+
+	file.write(name.c_str(), name_size);
+	
+	uint64_t num_nodes = nodes.size();
+	file.write(reinterpret_cast<char*>(&num_nodes), sizeof(num_nodes));
 
 	for (const Node* n : nodes)
 	{
-		text += n->serialize();
+		n->serialize(file);
 	}
-
-	return text;
 }
 
-Directory* Directory::fromStream(std::istream& stream)
+Directory* Directory::fromFile(std::fstream& file)
 {
+	uint32_t name_size = 0;
+	file.read(reinterpret_cast<char*>(&name_size), sizeof(name_size));
+
 	std::string dirname;
-	stream >> dirname;
+	for (int i = 0; i < name_size; i++)
+	{
+		char c;
+		file.read(&c, sizeof(c));
+		dirname += c;
+	}
 
 	Directory* dir = new Directory(dirname);
+	dir->name = dirname;
 
 	uint64_t num_elements;
-	stream >> num_elements;
+	file.read(reinterpret_cast<char*>(&num_elements), sizeof(num_elements));
 
-	for (int i = 0; i < num_elements; i++)
+	for (uint64_t i = 0; i < num_elements; i++)
 	{
 		std::string type;
-		stream >> type;
-
-		if (type == "DIRECTORY")
+		for (int i = 0; i < 3; i++)
 		{
-			Directory* subdir = fromStream(stream);
+			char c;
+			file.read(&c, sizeof(c));
+			type += c;
+		}
+
+		if (type == "DIR")
+		{
+			Directory* subdir = fromFile(file);
+			if (!subdir)
+			{
+				std::cout << "loading of dir failed\n";
+				return nullptr;
+			}
+
 			dir->addNode(subdir);
 		}
-		else if (type == "FILE")
+		else if (type == "FIL")
 		{
-			File* subfile = File::fromStream(stream);
+			File* subfile = File::fromFile(file);
+			if (!subfile)
+			{
+				std::cout << "loading of file failed\n";
+				return nullptr;
+			}
+
 			dir->addNode(subfile);
 		}
 		else

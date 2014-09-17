@@ -23,15 +23,18 @@ public:
 	File* getFile(const std::string& filename) const;
 
 	Node* addNode(Node* n);
+	void removeNode(const std::string& nodename);
+	void renameNode(const std::string& n, const std::string& newname);
 
 	// Serialization
-	virtual std::string serialize() const;
-	static Directory* fromStream(std::istream& stream);
+	virtual void serialize(std::fstream& file) const;
+	static Directory* fromFile(std::fstream& file);
 
 	friend class Node;
 
 private:
 	std::vector<Node*> nodes;
+	std::vector<Node*> removed;
 };
 
 }

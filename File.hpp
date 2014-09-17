@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <sstream>
+#include <fstream>
 
 #include "Node.hpp"
 
@@ -23,8 +23,8 @@ public:
 	std::string getDataAsString() const;
 
 	// Serialization
-	virtual std::string serialize() const;
-	static File* fromStream(std::istream& stream);
+	virtual void serialize(std::fstream& file) const;
+	static File* fromFile(std::fstream& file);
 
 private:
 	std::vector<char> data;
