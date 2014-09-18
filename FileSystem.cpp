@@ -26,7 +26,7 @@ bool FileSystem::load(const std::string& filename)
 		return false;
 	}
 
-	file.open(filename, std::ios::in | std::ios::in | std::ios::binary);
+	file.open(filename, std::ios::in|std::ios::out|std::ios::binary);
 	if (!file)
 	{
 		std::cout << "failed to open file\n";
@@ -64,7 +64,8 @@ bool FileSystem::create(const std::string& filename)
 		return false;
 	}
 
-	file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
+	file.open(filename,
+		std::ios::in|std::ios::out|std::ios::binary|std::ios::trunc);
 	if (!file)
 	{
 		std::cout << "failed to open file" << std::endl;
