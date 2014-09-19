@@ -6,7 +6,7 @@ namespace SpFS
 File::File(const std::string& filename)
 {
 	parent = nullptr;
-	name = filename;
+	name = filename.substr(filename.find_last_of("\\/")+1);
 	type = Type::File;
 }
 
@@ -31,6 +31,12 @@ void File::append(const char& c)
 std::vector<char> File::getData() const
 {
 	return data;
+}
+
+void File::setData(const std::vector<char>& new_data)
+{
+	data.clear();
+	data = new_data;
 }
 
 std::string File::getDataAsString() const
@@ -63,7 +69,7 @@ File* File::fromFile(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&name_size), sizeof(name_size));
 
 	std::string filename;
-	for (int i = 0; i < name_size; i++)
+	for (uint32_t i = 0; i < name_size; i++)
 	{
 		char c;
 		file.read(&c, sizeof(c));
@@ -77,7 +83,7 @@ File* File::fromFile(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
 	newfile->data.reserve(size);
-	for (int i = 0; i < size; i++)
+	for (uint64_t i = 0; i < size; i++)
 	{
 		char c;
 		file.read(&c, sizeof(c));

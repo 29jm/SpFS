@@ -20,6 +20,7 @@ public:
 	void append(const char& c);
 
 	std::vector<char> getData() const;
+	void setData(const std::vector<char>& new_data);
 	std::string getDataAsString() const;
 
 	// Serialization
