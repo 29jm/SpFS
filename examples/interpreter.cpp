@@ -3,7 +3,7 @@
 #include <vector>
 #include <sstream>
 
-#include <SpFS.hpp>
+#include <SpFS/SpFS.hpp>
 
 using namespace std;
 using namespace SpFS;

@@ -1,4 +1,4 @@
-CXXFLAGS = -std=c++11 -Wall
+override CXXFLAGS = -std=c++11 -Wall
 LIBFLAGS = -fPIC
 DEPS = Node.o File.o Directory.o FileSystem.o
 EXAMPLES = example_write.o example_read.o interpreter.o
@@ -9,7 +9,16 @@ debug: CXXFLAGS += -g
 debug: clean all
 
 clean:
-	rm *.o
+	rm -f *.o
+
+install:
+	cp libSpFS.so /usr/lib
+	mkdir /usr/include/SpFS
+	cp *.hpp /usr/include/SpFS
+
+uninstall:
+	rm /usr/lib/libSpFS.so
+	rm -r /usr/include/SpFS
 
 SpFS: $(DEPS)
 	$(CXX) $(CXXFLAGS) $(LIBFLAGS) -shared $(DEPS) -o libSpFS.so
@@ -32,10 +41,10 @@ FileSystem.o: FileSystem.hpp FileSystem.cpp
 	$(CXX) $(CXXFLAGS) $(LIBFLAGS) -c FileSystem.cpp -o FileSystem.o
 
 example_write.o: examples/example_write.cpp
-	$(CXX) $(CXXFLAGS) -I"./" -c examples/example_write.cpp -o example_write.o
+	$(CXX) $(CXXFLAGS) -c examples/example_write.cpp -o example_write.o
 
 example_read.o: examples/example_read.cpp
-	$(CXX) $(CXXFLAGS) -I"./" -c examples/example_read.cpp -o example_read.o
+	$(CXX) $(CXXFLAGS)  -c examples/example_read.cpp -o example_read.o
 
 interpreter.o: examples/interpreter.cpp
-	$(CXX) $(CXXFLAGS) -I"./" -c examples/interpreter.cpp -o interpreter.o
+	$(CXX) $(CXXFLAGS) -c examples/interpreter.cpp -o interpreter.o

@@ -1,4 +1,4 @@
-#include <SpFS.hpp>
+#include <SpFS/SpFS.hpp>
 #include <iostream>
 
 using namespace SpFS;
