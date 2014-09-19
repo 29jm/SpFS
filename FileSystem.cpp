@@ -18,7 +18,7 @@ FileSystem::~FileSystem()
 	}
 }
 
-bool FileSystem::load(const std::string& filename)
+bool FileSystem::load(const std::string& fs_name)
 {
 	if (valid_state)
 	{
@@ -26,12 +26,14 @@ bool FileSystem::load(const std::string& filename)
 		return false;
 	}
 
-	file.open(filename, std::ios::in|std::ios::out|std::ios::binary);
+	file.open(fs_name, std::ios::in|std::ios::out|std::ios::binary);
 	if (!file)
 	{
 		std::cout << "failed to open file\n";
 		return false;
 	}
+
+	filename = fs_name;
 
 	std::string type;
 	for (int i = 0; i < 3; i++)
@@ -57,20 +59,22 @@ bool FileSystem::load(const std::string& filename)
 	return true;
 }
 
-bool FileSystem::create(const std::string& filename)
+bool FileSystem::create(const std::string& fs_name)
 {
 	if (root)
 	{
 		return false;
 	}
 
-	file.open(filename,
+	file.open(fs_name,
 		std::ios::in|std::ios::out|std::ios::binary|std::ios::trunc);
 	if (!file)
 	{
 		std::cout << "failed to open file" << std::endl;
 		return false;
 	}
+
+	filename = fs_name;
 
 	root = new Directory("/");
 
@@ -84,7 +88,11 @@ void FileSystem::flush()
 		return;
 	}
 
+	file.close();
+	file.clear();
+	file.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
 	root->serialize(file);
+	file.flush();
 }
 
 Directory* FileSystem::getRoot() const
