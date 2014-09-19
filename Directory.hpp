@@ -19,7 +19,7 @@ public:
 
 	std::vector<Node*> getChilds() const;
 	Node* getNode(const std::string& nodename) const;
-	Directory* getDirectory(const std::string& dirname) const;
+	Directory* getDirectory(const std::string& dirname);
 	File* getFile(const std::string& filename) const;
 
 	Node* addNode(Node* n);

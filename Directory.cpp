@@ -83,8 +83,18 @@ Node* Directory::getNode(const std::string& nodename) const
 	return nullptr;
 }
 
-Directory* Directory::getDirectory(const std::string& dirname) const
+Directory* Directory::getDirectory(const std::string& dirname)
 {
+	if (dirname == ".")
+	{
+		return this;
+	}
+
+	if (dirname == "..")
+	{
+		return dynamic_cast<Directory*>(parent);
+	}
+
 	for (Node* n : nodes)
 	{
 		if (n->name == dirname && n->type == Type::Directory)
@@ -135,7 +145,7 @@ Directory* Directory::fromFile(std::fstream& file)
 	file.read(reinterpret_cast<char*>(&name_size), sizeof(name_size));
 
 	std::string dirname;
-	for (int i = 0; i < name_size; i++)
+	for (uint32_t i = 0; i < name_size; i++)
 	{
 		char c;
 		file.read(&c, sizeof(c));
