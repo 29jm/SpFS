@@ -22,6 +22,7 @@ public:
 
 	virtual std::string getPath() const;
 	virtual std::string getName() const;
+	virtual Directory* getParent() const;
 	virtual Type getType() const;
 
 protected:

@@ -10,6 +10,11 @@ Node::~Node()
 
 std::string Node::getPath() const
 {
+	if (!this->parent)
+	{
+		return name;
+	}
+
 	std::string path(name);
 	const Node* node = this->parent;
 
@@ -27,6 +32,11 @@ std::string Node::getPath() const
 std::string Node::getName() const
 {
 	return name;
+}
+
+Directory* Node::getParent() const
+{
+	return reinterpret_cast<Directory*>(parent);
 }
 
 Node::Type Node::getType() const
