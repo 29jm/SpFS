@@ -70,6 +70,11 @@ std::vector<Node*> Directory::getChilds() const
 	return nodes;
 }
 
+uint32_t Directory::getSize() const
+{
+	return nodes.size();
+}
+
 Node* Directory::getNode(const std::string& nodename) const
 {
 	for (Node* n : nodes)

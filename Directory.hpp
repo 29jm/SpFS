@@ -18,6 +18,7 @@ public:
 	~Directory();
 
 	std::vector<Node*> getChilds() const;
+	uint32_t getSize() const;
 	Node* getNode(const std::string& nodename) const;
 	Directory* getDirectory(const std::string& dirname);
 	File* getFile(const std::string& filename) const;
