@@ -10,8 +10,10 @@ using namespace SpFS;
 
 bool moveFromDisk(const string& source, Directory* dest);
 bool moveFromPartition(File* source, const string& dest);
+bool move(string source, string dest, Directory* cwd);
 void list_directory(Directory* dir);
-void remove(File* file);
+void remove(Node* file);
+void mkdir(Directory* dir, const string& dirname);
 
 vector<string>& split(const string &s, char delim, vector<string> &elems);
 vector<string> split(const string &s, char delim);
@@ -96,7 +98,33 @@ int main()
 				continue;
 			}
 
-			remove(actual_dir->getFile(tokens[1]));
+			remove(actual_dir->getNode(tokens[1]));
+		}
+
+		if (tokens[0] == "mkdir") {
+			if (tokens.size() < 2) {
+				continue;
+			}
+
+			mkdir(actual_dir, tokens[1]);
+		}
+
+		if (tokens[0] == "cd") {
+			if (tokens.size() > 1) {
+				Directory* dir = actual_dir->getDirectory(tokens[1]);
+				if (dir) {
+					actual_dir = dir;
+				}
+				else {
+					cout << tokens[1] << " is not a file or directory\n";
+				}
+			}
+		}
+
+		if (tokens[0] == "mv") {
+			if (tokens.size() > 2) {
+				move(tokens[1], tokens[2], actual_dir);
+			}
 		}
 
 		if (tokens[0] == "exit") {
@@ -110,11 +138,13 @@ int main()
 bool moveFromDisk(const string& source, Directory* dest)
 {
 	if (!dest) {
+		cout << "Bad destination directory\n";
 		return false;
 	}
 
 	ifstream input_file(source, ios::binary);
 	if (!input_file) {
+		cout << "Could not open source file\n";
 		return false;
 	}
 
@@ -140,11 +170,13 @@ bool moveFromDisk(const string& source, Directory* dest)
 bool moveFromPartition(File* source, const string& dest)
 {
 	if (!source) {
+		cout << "Bad source file\n";
 		return false;
 	}
 
 	ofstream file(dest, ios::binary);
 	if (!file) {
+		cout << "Could not create destination file\n";
 		return false;
 	}
 
@@ -152,6 +184,41 @@ bool moveFromPartition(File* source, const string& dest)
 
 	vector<char> data(source->getData());
 	file.write(&data[0], data.size());
+
+	return true;
+}
+
+bool move(string source, string dest, Directory* cwd)
+{
+	if (source.substr(0, 5) == "disk:") {
+		source.erase(0, 5);
+		dest.erase(0, 5);
+		moveFromDisk(source, cwd->getDirectory(dest));
+	}
+	else if (source.substr(0, 5) == "SpFS:") {
+		if (dest.substr(0, 5) == "SpFS:") {	
+			source.erase(0, 5);
+			dest.erase(0, 5);
+			
+			File* fsource = cwd->getFile(source);
+			Directory* fdest = cwd->getDirectory(dest);
+			if (!fsource || !fdest) {
+				cout << "Could not find one of the source/target\n";
+			}
+
+			fdest->addNode(fsource);
+			cwd->removeNode(source);
+		}
+		else {
+			source.erase(0, 5);
+			dest.erase(0, 5);
+			moveFromPartition(cwd->getFile(source), dest);
+		}
+	}
+	else {
+		cout << "You must prefix the filenames with either disk: or SpFS:\n";
+		return false;
+	}
 
 	return true;
 }
@@ -168,14 +235,24 @@ void list_directory(Directory* dir)
 	}
 }
 
-void remove(File* file)
+void remove(Node* node)
 {
-	if (!file) {
+	if (!node) {
 		return;
 	}
 
-	Directory* parent = file->getParent();
-	parent->removeNode(file->getName());
+	Directory* parent = node->getParent();
+	parent->removeNode(node->getName());
+}
+
+void mkdir(Directory* dir, const string& dirname)
+{
+	if (!dir) {
+		return;
+	}
+
+	Directory* newdir = new Directory(dirname);
+	dir->addNode(newdir);
 }
 
 vector<string> &split(const string &s, char delim, vector<string> &elems) {
