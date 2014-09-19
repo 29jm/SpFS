@@ -13,8 +13,6 @@ bool moveFromPartition(File* source, const string& dest);
 void list_directory(Directory* dir);
 void remove(File* file);
 
-Directory* getDirectory(const string& dir, Directory* parent);
-
 vector<string>& split(const string &s, char delim, vector<string> &elems);
 vector<string> split(const string &s, char delim);
 
@@ -164,6 +162,7 @@ void list_directory(Directory* dir)
 		return;
 	}
 
+	cout << dir->getSize() << " elements\n";
 	for (Node* n : dir->getChilds()) {
 		cout << n->getName() << endl;
 	}
@@ -177,11 +176,6 @@ void remove(File* file)
 
 	Directory* parent = file->getParent();
 	parent->removeNode(file->getName());
-}
-
-Directory* getDirectory(const string& dir, Directory* parent)
-{
-	return parent->getDirectory(dir);
 }
 
 vector<string> &split(const string &s, char delim, vector<string> &elems) {
