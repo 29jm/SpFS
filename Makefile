@@ -12,9 +12,9 @@ clean:
 	rm -f *.o
 
 install:
-	cp libSpFS.so /usr/lib
-	mkdir /usr/include/SpFS
-	cp *.hpp /usr/include/SpFS
+	cp -f libSpFS.so /usr/lib
+	mkdir -p /usr/include/SpFS
+	cp -f *.hpp /usr/include/SpFS
 
 uninstall:
 	rm /usr/lib/libSpFS.so
