@@ -11,6 +11,8 @@
 namespace SpFS
 {
 
+std::vector<std::string> split(const std::string& s, char delim);
+
 class Directory : public Node
 {
 public:
