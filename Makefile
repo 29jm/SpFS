@@ -10,6 +10,7 @@ debug: clean all
 
 clean:
 	rm -f *.o
+	find . -maxdepth 1 -type f -executable | xargs rm
 
 install:
 	cp -f libSpFS.so /usr/lib
@@ -41,10 +42,10 @@ FileSystem.o: FileSystem.hpp FileSystem.cpp
 	$(CXX) $(CXXFLAGS) $(LIBFLAGS) -c FileSystem.cpp -o FileSystem.o
 
 example_write.o: examples/example_write.cpp
-	$(CXX) $(CXXFLAGS) -c examples/example_write.cpp -o example_write.o
+	$(CXX) $(CXXFLAGS) -c -I"./" examples/example_write.cpp -o example_write.o
 
 example_read.o: examples/example_read.cpp
-	$(CXX) $(CXXFLAGS)  -c examples/example_read.cpp -o example_read.o
+	$(CXX) $(CXXFLAGS)  -c -I"./" examples/example_read.cpp -o example_read.o
 
 interpreter.o: examples/interpreter.cpp
-	$(CXX) $(CXXFLAGS) -c examples/interpreter.cpp -o interpreter.o
+	$(CXX) $(CXXFLAGS) -c -I"./" examples/interpreter.cpp -o interpreter.o

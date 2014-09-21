@@ -15,8 +15,8 @@ void list_directory(Directory* dir);
 void remove(Node* file);
 void mkdir(Directory* dir, const string& dirname);
 
-vector<string>& split(const string &s, char delim, vector<string> &elems);
-vector<string> split(const string &s, char delim);
+vector<string>& splitstring(const string &s, char delim, vector<string> &elems);
+vector<string> splitstring(const string &s, char delim);
 
 int main()
 {
@@ -68,7 +68,7 @@ int main()
 			continue;
 		}
 
-		vector<string> tokens(split(command, ' '));
+		vector<string> tokens(splitstring(command, ' '));
 		if (tokens[0] == "moveFromDisk") {
 			if (tokens.size() < 3) {
 				continue;
@@ -255,7 +255,7 @@ void mkdir(Directory* dir, const string& dirname)
 	dir->addNode(newdir);
 }
 
-vector<string> &split(const string &s, char delim, vector<string> &elems) {
+vector<string> &splitstring(const string &s, char delim, vector<string> &elems) {
 	std::stringstream ss(s);
 	std::string item;
 	while (std::getline(ss, item, delim)) {
@@ -266,8 +266,8 @@ vector<string> &split(const string &s, char delim, vector<string> &elems) {
 }
 
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> splitstring(const std::string &s, char delim) {
 	std::vector<std::string> elems;
-	split(s, delim, elems);
+	splitstring(s, delim, elems);
 	return elems;
 }

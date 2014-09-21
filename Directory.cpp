@@ -3,6 +3,17 @@
 namespace SpFS
 {
 
+std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+
+	return elems;
+}
+
 Directory::Directory(const std::string& dirname)
 {
 	parent = nullptr;
@@ -77,11 +88,51 @@ uint32_t Directory::getSize() const
 
 Node* Directory::getNode(const std::string& nodename) const
 {
-	for (Node* n : nodes)
+	std::vector<std::string> dirs(split(nodename,'/'));
+	const Directory* subdir = this;
+
+	for (unsigned int i = 0; i < dirs.size(); i++)
 	{
-		if (n->name == nodename)
+		if (dirs[i] == "..")
 		{
-			return n;
+			subdir = subdir->getParent();
+			continue;
+		}
+		else if (dirs[i] == ".")
+		{
+			continue;
+		}
+
+		bool found = false;
+		for (unsigned int j = 0; j < subdir->getSize(); j++)
+		{
+			if (subdir->nodes[j]->getName() == dirs[i])
+			{
+				found = true;
+
+				if (i == dirs.size()-1)
+				{
+					// Target found
+					return subdir->nodes[j];
+				}
+
+				if (subdir->nodes[j]->type == Type::Directory)
+				{
+					// Next node found
+					subdir = dynamic_cast<Directory*>(subdir->nodes[j]);
+					break;
+				}
+				else
+				{
+					// Not a Directory, cannot continue iterating
+					return nullptr;
+				}
+			}
+		}
+
+		if (!found)
+		{
+			return nullptr;
 		}
 	}
 
@@ -90,35 +141,15 @@ Node* Directory::getNode(const std::string& nodename) const
 
 Directory* Directory::getDirectory(const std::string& dirname)
 {
-	if (dirname == ".")
-	{
-		return this;
-	}
-
-	if (dirname == "..")
-	{
-		return dynamic_cast<Directory*>(parent);
-	}
-
-	for (Node* n : nodes)
-	{
-		if (n->name == dirname && n->type == Type::Directory)
-		{
-			return dynamic_cast<Directory*>(n);
-		}
-	}
-
-	return nullptr;
+	return dynamic_cast<Directory*>(getNode(dirname));
 }
 
 File* Directory::getFile(const std::string& filename) const
 {
-	for (Node* n : nodes)
+	Node* res = getNode(filename);
+	if (res && res->getType() == Node::Type::File)
 	{
-		if (n->name == filename && n->type == Type::File)
-		{
-			return dynamic_cast<File*>(n);
-		}
+		return dynamic_cast<File*>(res);
 	}
 
 	return nullptr;
