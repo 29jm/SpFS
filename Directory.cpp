@@ -93,6 +93,16 @@ Node* Directory::getNode(const std::string& nodename) const
 
 	for (unsigned int i = 0; i < dirs.size(); i++)
 	{
+		if (dirs[i] == "..")
+		{
+			subdir = subdir->getParent();
+			continue;
+		}
+		else if (dirs[i] == ".")
+		{
+			continue;
+		}
+
 		bool found = false;
 		for (unsigned int j = 0; j < subdir->getSize(); j++)
 		{
@@ -102,16 +112,19 @@ Node* Directory::getNode(const std::string& nodename) const
 
 				if (i == dirs.size()-1)
 				{
+					// Target found
 					return subdir->nodes[j];
 				}
 
 				if (subdir->nodes[j]->type == Type::Directory)
 				{
-					subdir = reinterpret_cast<Directory*>(subdir->nodes[j]);
+					// Next node found
+					subdir = dynamic_cast<Directory*>(subdir->nodes[j]);
 					break;
 				}
 				else
 				{
+					// Not a Directory, cannot continue iterating
 					return nullptr;
 				}
 			}
@@ -128,24 +141,7 @@ Node* Directory::getNode(const std::string& nodename) const
 
 Directory* Directory::getDirectory(const std::string& dirname)
 {
-	if (dirname == ".")
-	{
-		return this;
-	}
-
-	if (dirname == "..")
-	{
-		return dynamic_cast<Directory*>(parent);
-	}
-
-	Node* res = getNode(dirname);
-	if (res && res->getType() == Node::Type::Directory)
-	{
-		return reinterpret_cast<Directory*>(res);
-	}
-
-	return nullptr;
-
+	return dynamic_cast<Directory*>(getNode(dirname));
 }
 
 File* Directory::getFile(const std::string& filename) const
@@ -153,7 +149,7 @@ File* Directory::getFile(const std::string& filename) const
 	Node* res = getNode(filename);
 	if (res && res->getType() == Node::Type::File)
 	{
-		return reinterpret_cast<File*>(res);
+		return dynamic_cast<File*>(res);
 	}
 
 	return nullptr;

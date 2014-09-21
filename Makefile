@@ -10,6 +10,7 @@ debug: clean all
 
 clean:
 	rm -f *.o
+	find . -maxdepth 1 -type f -executable | xargs rm
 
 install:
 	cp -f libSpFS.so /usr/lib

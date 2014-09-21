@@ -100,5 +100,35 @@ Directory* FileSystem::getRoot() const
 	return root;
 }
 
+Directory* FileSystem::getDirectory(const std::string& path)
+{
+	return getDirectory(path, root);
+}
+
+Directory* FileSystem::getDirectory(const std::string& path, Directory* base)
+{
+	return dynamic_cast<Directory*>(getNode(path, base));
+}
+
+File* FileSystem::getFile(const std::string& path)
+{
+	return getFile(path, root);
+}
+
+File* FileSystem::getFile(const std::string& path, Directory* base)
+{
+	return dynamic_cast<File*>(getNode(path, base));
+}
+
+Node* FileSystem::getNode(const std::string& path)
+{
+	return getNode(path, root);
+}
+
+Node* FileSystem::getNode(const std::string& path, Directory* base)
+{
+	return base->getNode(path);
+}
+
 }
 

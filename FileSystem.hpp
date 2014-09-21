@@ -22,7 +22,16 @@ public:
 
 	Directory* getRoot() const;
 
+	// Default parameter allows to search a subdirectory
+	Directory* getDirectory(const std::string& path);
+	Directory* getDirectory(const std::string& path, Directory* base);
+	File* getFile(const std::string& path, Directory* base);
+	File* getFile(const std::string& path);
+
 private:
+	Node* getNode(const std::string& path);
+	Node* getNode(const std::string& path, Directory* base);
+
 	std::fstream file;
 	std::string filename;
 	Directory* root;
